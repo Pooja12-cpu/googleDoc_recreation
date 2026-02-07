@@ -6,7 +6,7 @@
     <title>Google Docs Menu Panel</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Arial&family=Times+New+Roman&family=Courier+New&family=Georgia&family=Verdana&family=Comic+Sans+MS&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -60,10 +60,15 @@
             padding: 4px 8px;
             border-radius: 3px;
             cursor: text;
+            outline: none;
         }
 
         .doc-title:hover {
             border-color: #dadce0;
+        }
+
+        .doc-title:focus {
+            border-color: #4285f4;
         }
 
         .header-icons {
@@ -248,6 +253,7 @@
             align-items: center;
             gap: 4px;
             font-family: 'Roboto', Arial, sans-serif;
+            position: relative;
         }
 
         .toolbar-dropdown:hover {
@@ -259,11 +265,43 @@
             color: #5f6368;
         }
 
-        /* Demo content area */
+        /* Dropdown lists for toolbar */
+        .toolbar-dropdown-list {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            min-width: 180px;
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: 0 2px 6px 2px rgba(60,64,67,0.15);
+            border-radius: 4px;
+            padding: 8px 0;
+            z-index: 1000;
+            margin-top: 4px;
+        }
+
+        .toolbar-dropdown.active .toolbar-dropdown-list {
+            display: block;
+        }
+
+        .toolbar-dropdown-list-item {
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #202124;
+        }
+
+        .toolbar-dropdown-list-item:hover {
+            background: #f1f3f4;
+        }
+
+        /* Content area */
         .content {
             padding: 40px 96px;
             min-height: 400px;
-            background: white;
+            background: #f9fbfd;
         }
 
         .page {
@@ -271,6 +309,15 @@
             box-shadow: 0 0 0 1px #dadce0;
             padding: 96px;
             min-height: 800px;
+        }
+
+        #editor {
+            outline: none;
+            font-size: 11pt;
+            line-height: 1.6;
+            color: #202124;
+            font-family: Arial, sans-serif;
+            min-height: 600px;
         }
 
         /* Icons using Unicode */
@@ -288,10 +335,45 @@
         .icon-align-left::before { content: "≡"; }
         .icon-list::before { content: "☰"; }
 
-        .demo-text {
-            font-size: 11pt;
-            line-height: 1.6;
-            color: #202124;
+        /* Color picker */
+        .color-picker-wrapper {
+            position: relative;
+        }
+
+        .color-picker {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            box-shadow: 0 2px 6px 2px rgba(60,64,67,0.15);
+            border-radius: 4px;
+            padding: 12px;
+            z-index: 1000;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .color-picker.active {
+            display: block;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 24px);
+            gap: 4px;
+        }
+
+        .color-option {
+            width: 24px;
+            height: 24px;
+            border-radius: 2px;
+            cursor: pointer;
+            border: 1px solid #dadce0;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+            border-color: #4285f4;
         }
     </style>
 </head>
@@ -301,7 +383,7 @@
         <div class="header">
             <div class="title-bar">
                 <div class="doc-icon">📄</div>
-                <div class="doc-title">Untitled document</div>
+                <input type="text" class="doc-title" value="Untitled document" id="docTitle">
                 <div class="header-icons">
                     <button class="icon-button">⭐</button>
                     <button class="icon-button">📁</button>
@@ -314,58 +396,7 @@
                 <div class="dropdown">
                     <button class="menu-item">File</button>
                     <div class="dropdown-content">
-                        <div class="dropdown-item">
-                            <span>New</span>
-                            <span class="submenu-indicator">▶</span>
-                        </div>
-                        <div class="dropdown-item">
-                            <span>Open</span>
-                            <span class="shortcut">Ctrl+O</span>
-                        </div>
-                        <div class="dropdown-item">
-                            <span>Make a copy</span>
-                        </div>
-                        <div class="divider"></div>
-                        <div class="dropdown-item">
-                            <span>Share</span>
-                        </div>
-                        <div class="dropdown-item">
-                            <span>Email</span>
-                            <span class="submenu-indicator">▶</span>
-                        </div>
-                        <div class="dropdown-item">
-                            <span>Download</span>
-                            <span class="submenu-indicator">▶</span>
-                        </div>
-                        <div class="divider"></div>
-                        <div class="dropdown-item">
-                            <span>Rename</span>
-                        </div>
-                        <div class="dropdown-item">
-                            <span>Move</span>
-                        </div>
-                        <div class="dropdown-item">
-                            <span>Move to trash</span>
-                        </div>
-                        <div class="divider"></div>
-                        <div class="dropdown-item">
-                            <span>Version history</span>
-                            <span class="shortcut">Ctrl+Alt+Shift+H</span>
-                        </div>
-                        <div class="dropdown-item">
-                            <span>Make available offline</span>
-                        </div>
-                        <div class="divider"></div>
-                        <div class="dropdown-item">
-                            <span>Details</span>
-                        </div>
-                        <div class="dropdown-item">
-                            <span>Language</span>
-                        </div>
-                        <div class="dropdown-item">
-                            <span>Page setup</span>
-                        </div>
-                        <div class="dropdown-item">
+                        <div class="dropdown-item" onclick="printDocument()">
                             <span>Print</span>
                             <span class="shortcut">Ctrl+P</span>
                         </div>
@@ -375,43 +406,31 @@
                 <div class="dropdown">
                     <button class="menu-item">Edit</button>
                     <div class="dropdown-content">
-                        <div class="dropdown-item">
+                        <div class="dropdown-item" onclick="document.execCommand('undo')">
                             <span>Undo</span>
                             <span class="shortcut">Ctrl+Z</span>
                         </div>
-                        <div class="dropdown-item">
+                        <div class="dropdown-item" onclick="document.execCommand('redo')">
                             <span>Redo</span>
                             <span class="shortcut">Ctrl+Y</span>
                         </div>
                         <div class="divider"></div>
-                        <div class="dropdown-item">
+                        <div class="dropdown-item" onclick="document.execCommand('cut')">
                             <span>Cut</span>
                             <span class="shortcut">Ctrl+X</span>
                         </div>
-                        <div class="dropdown-item">
+                        <div class="dropdown-item" onclick="document.execCommand('copy')">
                             <span>Copy</span>
                             <span class="shortcut">Ctrl+C</span>
                         </div>
-                        <div class="dropdown-item">
+                        <div class="dropdown-item" onclick="document.execCommand('paste')">
                             <span>Paste</span>
                             <span class="shortcut">Ctrl+V</span>
                         </div>
-                        <div class="dropdown-item">
-                            <span>Paste without formatting</span>
-                            <span class="shortcut">Ctrl+Shift+V</span>
-                        </div>
                         <div class="divider"></div>
-                        <div class="dropdown-item">
+                        <div class="dropdown-item" onclick="document.execCommand('selectAll')">
                             <span>Select all</span>
                             <span class="shortcut">Ctrl+A</span>
-                        </div>
-                        <div class="dropdown-item">
-                            <span>Delete</span>
-                        </div>
-                        <div class="divider"></div>
-                        <div class="dropdown-item">
-                            <span>Find and replace</span>
-                            <span class="shortcut">Ctrl+H</span>
                         </div>
                     </div>
                 </div>
@@ -423,23 +442,7 @@
                             <span>Print layout</span>
                         </div>
                         <div class="dropdown-item">
-                            <span>Mode</span>
-                            <span class="submenu-indicator">▶</span>
-                        </div>
-                        <div class="divider"></div>
-                        <div class="dropdown-item">
                             <span>Show ruler</span>
-                        </div>
-                        <div class="dropdown-item">
-                            <span>Show equation toolbar</span>
-                        </div>
-                        <div class="dropdown-item">
-                            <span>Show section breaks</span>
-                        </div>
-                        <div class="divider"></div>
-                        <div class="dropdown-item">
-                            <span>Full screen</span>
-                            <span class="shortcut">F11</span>
                         </div>
                     </div>
                 </div>
@@ -447,40 +450,14 @@
                 <div class="dropdown">
                     <button class="menu-item">Insert</button>
                     <div class="dropdown-content">
-                        <div class="dropdown-item">
+                        <div class="dropdown-item" onclick="insertImage()">
                             <span>Image</span>
-                            <span class="submenu-indicator">▶</span>
                         </div>
-                        <div class="dropdown-item">
+                        <div class="dropdown-item" onclick="insertTable()">
                             <span>Table</span>
                         </div>
-                        <div class="dropdown-item">
-                            <span>Drawing</span>
-                        </div>
-                        <div class="dropdown-item">
-                            <span>Chart</span>
-                        </div>
-                        <div class="divider"></div>
-                        <div class="dropdown-item">
+                        <div class="dropdown-item" onclick="document.execCommand('insertHorizontalRule')">
                             <span>Horizontal line</span>
-                        </div>
-                        <div class="dropdown-item">
-                            <span>Footnote</span>
-                            <span class="shortcut">Ctrl+Alt+F</span>
-                        </div>
-                        <div class="dropdown-item">
-                            <span>Special characters</span>
-                        </div>
-                        <div class="divider"></div>
-                        <div class="dropdown-item">
-                            <span>Headers & footers</span>
-                        </div>
-                        <div class="dropdown-item">
-                            <span>Page numbers</span>
-                        </div>
-                        <div class="dropdown-item">
-                            <span>Page break</span>
-                            <span class="shortcut">Ctrl+Enter</span>
                         </div>
                     </div>
                 </div>
@@ -496,28 +473,7 @@
                             <span>Paragraph styles</span>
                             <span class="submenu-indicator">▶</span>
                         </div>
-                        <div class="dropdown-item">
-                            <span>Align & indent</span>
-                            <span class="submenu-indicator">▶</span>
-                        </div>
-                        <div class="dropdown-item">
-                            <span>Line & paragraph spacing</span>
-                            <span class="submenu-indicator">▶</span>
-                        </div>
-                        <div class="dropdown-item">
-                            <span>Columns</span>
-                            <span class="submenu-indicator">▶</span>
-                        </div>
-                        <div class="divider"></div>
-                        <div class="dropdown-item">
-                            <span>Bullets & numbering</span>
-                            <span class="submenu-indicator">▶</span>
-                        </div>
-                        <div class="dropdown-item">
-                            <span>Borders & lines</span>
-                        </div>
-                        <div class="divider"></div>
-                        <div class="dropdown-item">
+                        <div class="dropdown-item" onclick="document.execCommand('removeFormat')">
                             <span>Clear formatting</span>
                             <span class="shortcut">Ctrl+\</span>
                         </div>
@@ -527,45 +483,9 @@
                 <div class="dropdown">
                     <button class="menu-item">Tools</button>
                     <div class="dropdown-content">
-                        <div class="dropdown-item">
-                            <span>Spelling and grammar</span>
-                            <span class="shortcut">Ctrl+Alt+X</span>
-                        </div>
-                        <div class="dropdown-item">
+                        <div class="dropdown-item" onclick="showWordCount()">
                             <span>Word count</span>
                             <span class="shortcut">Ctrl+Shift+C</span>
-                        </div>
-                        <div class="divider"></div>
-                        <div class="dropdown-item">
-                            <span>Review suggested edits</span>
-                        </div>
-                        <div class="dropdown-item">
-                            <span>Compare documents</span>
-                        </div>
-                        <div class="divider"></div>
-                        <div class="dropdown-item">
-                            <span>Citations</span>
-                        </div>
-                        <div class="dropdown-item">
-                            <span>Dictionary</span>
-                            <span class="shortcut">Ctrl+Shift+Y</span>
-                        </div>
-                        <div class="dropdown-item">
-                            <span>Explore</span>
-                            <span class="shortcut">Ctrl+Alt+Shift+I</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="dropdown">
-                    <button class="menu-item">Extensions</button>
-                    <div class="dropdown-content">
-                        <div class="dropdown-item">
-                            <span>Add-ons</span>
-                            <span class="submenu-indicator">▶</span>
-                        </div>
-                        <div class="dropdown-item">
-                            <span>Apps Script</span>
                         </div>
                     </div>
                 </div>
@@ -574,32 +494,7 @@
                     <button class="menu-item">Help</button>
                     <div class="dropdown-content">
                         <div class="dropdown-item">
-                            <span>Search the menus</span>
-                            <span class="shortcut">Alt+/</span>
-                        </div>
-                        <div class="divider"></div>
-                        <div class="dropdown-item">
                             <span>Docs Help</span>
-                        </div>
-                        <div class="dropdown-item">
-                            <span>Training</span>
-                        </div>
-                        <div class="dropdown-item">
-                            <span>Updates</span>
-                        </div>
-                        <div class="divider"></div>
-                        <div class="dropdown-item">
-                            <span>Help Docs improve</span>
-                        </div>
-                        <div class="dropdown-item">
-                            <span>Report a problem</span>
-                        </div>
-                        <div class="divider"></div>
-                        <div class="dropdown-item">
-                            <span>Privacy Policy</span>
-                        </div>
-                        <div class="dropdown-item">
-                            <span>Terms of Service</span>
                         </div>
                         <div class="dropdown-item">
                             <span>Keyboard shortcuts</span>
@@ -612,76 +507,306 @@
 
         <!-- Toolbar -->
         <div class="toolbar">
-            <button class="toolbar-button icon-undo" title="Undo"></button>
-            <button class="toolbar-button icon-redo" title="Redo"></button>
-            <button class="toolbar-button icon-print" title="Print"></button>
-            <button class="toolbar-button" title="Spelling and grammar">A✓</button>
-            <button class="toolbar-button icon-paint" title="Paint format"></button>
+            <button class="toolbar-button icon-undo" title="Undo" onclick="document.execCommand('undo')"></button>
+            <button class="toolbar-button icon-redo" title="Redo" onclick="document.execCommand('redo')"></button>
+            <button class="toolbar-button icon-print" title="Print" onclick="printDocument()"></button>
             
             <div class="toolbar-divider"></div>
             
-            <div class="toolbar-dropdown">
-                <span>Normal text</span>
+            <div class="toolbar-dropdown" id="styleDropdown" onclick="toggleDropdown('styleDropdown')">
+                <span id="currentStyle">Normal text</span>
                 <span class="dropdown-arrow">▼</span>
+                <div class="toolbar-dropdown-list">
+                    <div class="toolbar-dropdown-list-item" onclick="applyStyle('p', 'Normal text'); event.stopPropagation();">Normal text</div>
+                    <div class="toolbar-dropdown-list-item" onclick="applyStyle('h1', 'Heading 1'); event.stopPropagation();" style="font-size: 20px; font-weight: bold;">Heading 1</div>
+                    <div class="toolbar-dropdown-list-item" onclick="applyStyle('h2', 'Heading 2'); event.stopPropagation();" style="font-size: 18px; font-weight: bold;">Heading 2</div>
+                    <div class="toolbar-dropdown-list-item" onclick="applyStyle('h3', 'Heading 3'); event.stopPropagation();" style="font-size: 16px; font-weight: bold;">Heading 3</div>
+                </div>
             </div>
             
             <div class="toolbar-divider"></div>
             
-            <div class="toolbar-dropdown">
-                <span>Arial</span>
+            <div class="toolbar-dropdown" id="fontDropdown" onclick="toggleDropdown('fontDropdown')">
+                <span id="currentFont">Arial</span>
                 <span class="dropdown-arrow">▼</span>
+                <div class="toolbar-dropdown-list">
+                    <div class="toolbar-dropdown-list-item" onclick="changeFont('Arial'); event.stopPropagation();" style="font-family: Arial;">Arial</div>
+                    <div class="toolbar-dropdown-list-item" onclick="changeFont('Times New Roman'); event.stopPropagation();" style="font-family: 'Times New Roman';">Times New Roman</div>
+                    <div class="toolbar-dropdown-list-item" onclick="changeFont('Courier New'); event.stopPropagation();" style="font-family: 'Courier New';">Courier New</div>
+                    <div class="toolbar-dropdown-list-item" onclick="changeFont('Georgia'); event.stopPropagation();" style="font-family: Georgia;">Georgia</div>
+                    <div class="toolbar-dropdown-list-item" onclick="changeFont('Verdana'); event.stopPropagation();" style="font-family: Verdana;">Verdana</div>
+                    <div class="toolbar-dropdown-list-item" onclick="changeFont('Comic Sans MS'); event.stopPropagation();" style="font-family: 'Comic Sans MS';">Comic Sans MS</div>
+                </div>
             </div>
             
             <div class="toolbar-divider"></div>
             
-            <div class="toolbar-dropdown">
-                <span>11</span>
+            <div class="toolbar-dropdown" id="sizeDropdown" onclick="toggleDropdown('sizeDropdown')">
+                <span id="currentSize">11</span>
                 <span class="dropdown-arrow">▼</span>
+                <div class="toolbar-dropdown-list">
+                    <div class="toolbar-dropdown-list-item" onclick="changeFontSize('8'); event.stopPropagation();">8</div>
+                    <div class="toolbar-dropdown-list-item" onclick="changeFontSize('9'); event.stopPropagation();">9</div>
+                    <div class="toolbar-dropdown-list-item" onclick="changeFontSize('10'); event.stopPropagation();">10</div>
+                    <div class="toolbar-dropdown-list-item" onclick="changeFontSize('11'); event.stopPropagation();">11</div>
+                    <div class="toolbar-dropdown-list-item" onclick="changeFontSize('12'); event.stopPropagation();">12</div>
+                    <div class="toolbar-dropdown-list-item" onclick="changeFontSize('14'); event.stopPropagation();">14</div>
+                    <div class="toolbar-dropdown-list-item" onclick="changeFontSize('18'); event.stopPropagation();">18</div>
+                    <div class="toolbar-dropdown-list-item" onclick="changeFontSize('24'); event.stopPropagation();">24</div>
+                    <div class="toolbar-dropdown-list-item" onclick="changeFontSize('36'); event.stopPropagation();">36</div>
+                </div>
             </div>
             
             <div class="toolbar-divider"></div>
             
-            <button class="toolbar-button icon-bold" title="Bold (Ctrl+B)"></button>
-            <button class="toolbar-button icon-italic" title="Italic (Ctrl+I)"></button>
-            <button class="toolbar-button icon-underline" title="Underline (Ctrl+U)"></button>
-            <button class="toolbar-button" title="Text color">A</button>
-            <button class="toolbar-button" title="Highlight color">🖍</button>
+            <button class="toolbar-button icon-bold" id="boldBtn" title="Bold (Ctrl+B)" onclick="toggleFormat('bold', 'boldBtn')"></button>
+            <button class="toolbar-button icon-italic" id="italicBtn" title="Italic (Ctrl+I)" onclick="toggleFormat('italic', 'italicBtn')"></button>
+            <button class="toolbar-button icon-underline" id="underlineBtn" title="Underline (Ctrl+U)" onclick="toggleFormat('underline', 'underlineBtn')"></button>
+            
+            <div class="color-picker-wrapper">
+                <button class="toolbar-button" id="textColorBtn" title="Text color" onclick="toggleColorPicker('textColorPicker')" style="position: relative;">
+                    <span style="position: relative;">A<span style="position: absolute; bottom: -2px; left: 0; right: 0; height: 3px; background: #000;"></span></span>
+                </button>
+                <div class="color-picker" id="textColorPicker">
+                    <div class="color-grid" id="textColorGrid"></div>
+                </div>
+            </div>
+            
+            <div class="color-picker-wrapper">
+                <button class="toolbar-button" id="highlightBtn" title="Highlight color" onclick="toggleColorPicker('highlightPicker')">🖍</button>
+                <div class="color-picker" id="highlightPicker">
+                    <div class="color-grid" id="highlightColorGrid"></div>
+                </div>
+            </div>
             
             <div class="toolbar-divider"></div>
             
-            <button class="toolbar-button icon-link" title="Insert link"></button>
-            <button class="toolbar-button icon-comment" title="Add comment"></button>
-            <button class="toolbar-button icon-image" title="Insert image"></button>
+            <button class="toolbar-button icon-link" title="Insert link" onclick="insertLink()"></button>
+            <button class="toolbar-button icon-image" title="Insert image" onclick="insertImage()"></button>
             
             <div class="toolbar-divider"></div>
             
-            <button class="toolbar-button icon-align-left" title="Align"></button>
-            <button class="toolbar-button" title="Line spacing">⇅</button>
+            <button class="toolbar-button" title="Align left" onclick="document.execCommand('justifyLeft')">⬅</button>
+            <button class="toolbar-button" title="Align center" onclick="document.execCommand('justifyCenter')">↔</button>
+            <button class="toolbar-button" title="Align right" onclick="document.execCommand('justifyRight')">➡</button>
+            <button class="toolbar-button" title="Justify" onclick="document.execCommand('justifyFull')">⬌</button>
             
             <div class="toolbar-divider"></div>
             
-            <button class="toolbar-button" title="Checklist">☐</button>
-            <button class="toolbar-button icon-list" title="Bulleted list"></button>
-            <button class="toolbar-button" title="Numbered list">1.</button>
+            <button class="toolbar-button icon-list" title="Bulleted list" onclick="document.execCommand('insertUnorderedList')"></button>
+            <button class="toolbar-button" title="Numbered list" onclick="document.execCommand('insertOrderedList')">1.</button>
             
             <div class="toolbar-divider"></div>
             
-            <button class="toolbar-button" title="Decrease indent">⇤</button>
-            <button class="toolbar-button" title="Increase indent">⇥</button>
+            <button class="toolbar-button" title="Decrease indent" onclick="document.execCommand('outdent')">⇤</button>
+            <button class="toolbar-button" title="Increase indent" onclick="document.execCommand('indent')">⇥</button>
             
             <div class="toolbar-divider"></div>
             
-            <button class="toolbar-button" title="Clear formatting">Tx</button>
+            <button class="toolbar-button" title="Clear formatting" onclick="document.execCommand('removeFormat')">Tx</button>
         </div>
 
-        <!-- Demo content area -->
+        <!-- Content area -->
         <div class="content">
             <div class="page">
-                <p class="demo-text">
-                    Start typing to create your document...
-                </p>
+                <div id="editor" contenteditable="true">
+                    <p>Start typing to create your document...</p>
+                </div>
             </div>
         </div>
     </div>
+
+    <script>
+        // Initialize color pickers
+        const colors = [
+            '#000000', '#434343', '#666666', '#999999', '#b7b7b7', '#cccccc', '#d9d9d9', '#efefef', '#f3f3f3', '#ffffff',
+            '#980000', '#ff0000', '#ff9900', '#ffff00', '#00ff00', '#00ffff', '#4a86e8', '#0000ff', '#9900ff', '#ff00ff',
+            '#e6b8af', '#f4cccc', '#fce5cd', '#fff2cc', '#d9ead3', '#d0e0e3', '#c9daf8', '#cfe2f3', '#d9d2e9', '#ead1dc',
+            '#dd7e6b', '#ea9999', '#f9cb9c', '#ffe599', '#b6d7a8', '#a2c4c9', '#a4c2f4', '#9fc5e8', '#b4a7d6', '#d5a6bd',
+            '#cc4125', '#e06666', '#f6b26b', '#ffd966', '#93c47d', '#76a5af', '#6d9eeb', '#6fa8dc', '#8e7cc3', '#c27ba0',
+            '#a61c00', '#cc0000', '#e69138', '#f1c232', '#6aa84f', '#45818e', '#3c78d8', '#3d85c6', '#674ea7', '#a64d79',
+            '#85200c', '#990000', '#b45f06', '#bf9000', '#38761d', '#134f5c', '#1155cc', '#0b5394', '#351c75', '#741b47',
+            '#5b0f00', '#660000', '#783f04', '#7f6000', '#274e13', '#0c343d', '#1c4587', '#073763', '#20124d', '#4c1130'
+        ];
+
+        function createColorGrid(gridId, type) {
+            const grid = document.getElementById(gridId);
+            colors.forEach(color => {
+                const colorOption = document.createElement('div');
+                colorOption.className = 'color-option';
+                colorOption.style.backgroundColor = color;
+                colorOption.onclick = () => {
+                    if (type === 'text') {
+                        document.execCommand('foreColor', false, color);
+                    } else {
+                        document.execCommand('hiliteColor', false, color);
+                    }
+                    toggleColorPicker(gridId.replace('Grid', 'Picker'));
+                };
+                grid.appendChild(colorOption);
+            });
+        }
+
+        createColorGrid('textColorGrid', 'text');
+        createColorGrid('highlightColorGrid', 'highlight');
+
+        // Toggle dropdown
+        function toggleDropdown(id) {
+            const dropdown = document.getElementById(id);
+            dropdown.classList.toggle('active');
+            
+            // Close other dropdowns
+            document.querySelectorAll('.toolbar-dropdown').forEach(d => {
+                if (d.id !== id) d.classList.remove('active');
+            });
+            
+            // Close color pickers
+            document.querySelectorAll('.color-picker').forEach(p => {
+                p.classList.remove('active');
+            });
+        }
+
+        // Toggle color picker
+        function toggleColorPicker(id) {
+            const picker = document.getElementById(id);
+            picker.classList.toggle('active');
+            
+            // Close dropdowns
+            document.querySelectorAll('.toolbar-dropdown').forEach(d => {
+                d.classList.remove('active');
+            });
+            
+            // Close other color pickers
+            document.querySelectorAll('.color-picker').forEach(p => {
+                if (p.id !== id) p.classList.remove('active');
+            });
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.toolbar-dropdown') && !e.target.closest('.color-picker-wrapper')) {
+                document.querySelectorAll('.toolbar-dropdown').forEach(d => {
+                    d.classList.remove('active');
+                });
+                document.querySelectorAll('.color-picker').forEach(p => {
+                    p.classList.remove('active');
+                });
+            }
+        });
+
+        // Change font
+        function changeFont(font) {
+            document.execCommand('fontName', false, font);
+            document.getElementById('currentFont').textContent = font;
+        }
+
+        // Change font size
+        function changeFontSize(size) {
+            document.execCommand('fontSize', false, '7');
+            const fontElements = document.querySelectorAll('font[size="7"]');
+            fontElements.forEach(element => {
+                element.removeAttribute('size');
+                element.style.fontSize = size + 'pt';
+            });
+            document.getElementById('currentSize').textContent = size;
+        }
+
+        // Apply style
+        function applyStyle(tag, name) {
+            document.execCommand('formatBlock', false, tag);
+            document.getElementById('currentStyle').textContent = name;
+        }
+
+        // Toggle format
+        function toggleFormat(command, btnId) {
+            document.execCommand(command);
+            const btn = document.getElementById(btnId);
+            btn.classList.toggle('active');
+        }
+
+        // Insert link
+        function insertLink() {
+            const url = prompt('Enter URL:');
+            if (url) {
+                document.execCommand('createLink', false, url);
+            }
+        }
+
+        // Insert image
+        function insertImage() {
+            const url = prompt('Enter image URL:');
+            if (url) {
+                document.execCommand('insertImage', false, url);
+            }
+        }
+
+        // Insert table
+        function insertTable() {
+            const rows = prompt('Number of rows:', '3');
+            const cols = prompt('Number of columns:', '3');
+            if (rows && cols) {
+                let table = '<table border="1" style="border-collapse: collapse; width: 100%;">';
+                for (let i = 0; i < rows; i++) {
+                    table += '<tr>';
+                    for (let j = 0; j < cols; j++) {
+                        table += '<td style="padding: 8px; border: 1px solid #dadce0;">&nbsp;</td>';
+                    }
+                    table += '</tr>';
+                }
+                table += '</table><p></p>';
+                document.execCommand('insertHTML', false, table);
+            }
+        }
+
+        // Print document
+        function printDocument() {
+            window.print();
+        }
+
+        // Show word count
+        function showWordCount() {
+            const text = document.getElementById('editor').innerText;
+            const words = text.trim().split(/\s+/).filter(word => word.length > 0).length;
+            const chars = text.length;
+            const charsNoSpaces = text.replace(/\s/g, '').length;
+            alert(`Words: ${words}\nCharacters: ${chars}\nCharacters (no spaces): ${charsNoSpaces}`);
+        }
+
+        // Update button states based on current selection
+        document.getElementById('editor').addEventListener('mouseup', updateButtonStates);
+        document.getElementById('editor').addEventListener('keyup', updateButtonStates);
+
+        function updateButtonStates() {
+            // Update bold, italic, underline buttons
+            document.getElementById('boldBtn').classList.toggle('active', document.queryCommandState('bold'));
+            document.getElementById('italicBtn').classList.toggle('active', document.queryCommandState('italic'));
+            document.getElementById('underlineBtn').classList.toggle('active', document.queryCommandState('underline'));
+        }
+
+        // Keyboard shortcuts
+        document.getElementById('editor').addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key.toLowerCase()) {
+                    case 'b':
+                        e.preventDefault();
+                        toggleFormat('bold', 'boldBtn');
+                        break;
+                    case 'i':
+                        e.preventDefault();
+                        toggleFormat('italic', 'italicBtn');
+                        break;
+                    case 'u':
+                        e.preventDefault();
+                        toggleFormat('underline', 'underlineBtn');
+                        break;
+                }
+            }
+        });
+
+        // Focus editor on load
+        window.addEventListener('load', function() {
+            document.getElementById('editor').focus();
+        });
+    </script>
 </body>
 </html>
