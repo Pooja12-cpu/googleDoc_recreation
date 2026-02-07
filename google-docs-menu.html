@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Docs Menu Panel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background: #f9fbfd;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+        }
+
+        /* Header with title */
+        .header {
+            padding: 16px 16px 0 16px;
+            border-bottom: 1px solid #dadce0;
+        }
+
+        .title-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .doc-icon {
+            width: 24px;
+            height: 24px;
+            background: #4285f4;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .doc-title {
+            font-size: 18px;
+            color: #202124;
+            border: 1px solid transparent;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: text;
+        }
+
+        .doc-title:hover {
+            border-color: #dadce0;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 4px;
+            margin-left: auto;
+            align-items: center;
+        }
+
+        .icon-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #5f6368;
+            font-size: 20px;
+            transition: background 0.2s;
+        }
+
+        .icon-button:hover {
+            background: #f1f3f4;
+        }
+
+        /* Menu Bar */
+        .menu-bar {
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            height: 48px;
+            gap: 2px;
+        }
+
+        .menu-item {
+            padding: 0 12px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: #202124;
+            cursor: pointer;
+            border-radius: 4px;
+            background: transparent;
+            border: none;
+            font-family: 'Roboto', Arial, sans-serif;
+            position: relative;
+            transition: background 0.15s;
+        }
+
+        .menu-item:hover {
+            background: #f1f3f4;
+        }
+
+        .menu-item.active {
+            background: #e8f0fe;
+        }
+
+        /* Dropdown menu */
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            min-width: 220px;
+            box-shadow: 0 2px 6px 2px rgba(60,64,67,0.15);
+            border-radius: 4px;
+            padding: 8px 0;
+            z-index: 1000;
+            margin-top: 4px;
+        }
+
+        .dropdown:hover .dropdown-content,
+        .dropdown-content:hover {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 10px 24px 10px 48px;
+            font-size: 14px;
+            color: #202124;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            white-space: nowrap;
+        }
+
+        .dropdown-item:hover {
+            background: #f1f3f4;
+        }
+
+        .dropdown-item.disabled {
+            color: #80868b;
+            cursor: default;
+        }
+
+        .dropdown-item.disabled:hover {
+            background: transparent;
+        }
+
+        .shortcut {
+            margin-left: 32px;
+            color: #5f6368;
+            font-size: 12px;
+        }
+
+        .divider {
+            height: 1px;
+            background: #e8eaed;
+            margin: 8px 0;
+        }
+
+        .submenu-indicator {
+            margin-left: auto;
+            font-size: 12px;
+            color: #5f6368;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            gap: 2px;
+            border-bottom: 1px solid #dadce0;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-button {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #444746;
+            font-size: 14px;
+            transition: background 0.2s;
+            font-family: 'Roboto', Arial, sans-serif;
+            font-weight: 500;
+        }
+
+        .toolbar-button:hover {
+            background: #f1f3f4;
+        }
+
+        .toolbar-button.active {
+            background: #d3e3fd;
+            color: #1a73e8;
+        }
+
+        .toolbar-divider {
+            width: 1px;
+            height: 24px;
+            background: #dadce0;
+            margin: 0 4px;
+        }
+
+        .toolbar-dropdown {
+            height: 32px;
+            padding: 0 8px;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            background: white;
+            font-size: 12px;
+            color: #202124;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+
+        .toolbar-dropdown:hover {
+            background: #f8f9fa;
+        }
+
+        .dropdown-arrow {
+            font-size: 10px;
+            color: #5f6368;
+        }
+
+        /* Demo content area */
+        .content {
+            padding: 40px 96px;
+            min-height: 400px;
+            background: white;
+        }
+
+        .page {
+            background: white;
+            box-shadow: 0 0 0 1px #dadce0;
+            padding: 96px;
+            min-height: 800px;
+        }
+
+        /* Icons using Unicode */
+        .icon-undo::before { content: "↶"; }
+        .icon-redo::before { content: "↷"; }
+        .icon-print::before { content: "🖨"; }
+        .icon-paint::before { content: "🖌"; }
+        .icon-zoom::before { content: "🔍"; }
+        .icon-bold::before { content: "B"; font-weight: 700; }
+        .icon-italic::before { content: "I"; font-style: italic; }
+        .icon-underline::before { content: "U"; text-decoration: underline; }
+        .icon-link::before { content: "🔗"; }
+        .icon-comment::before { content: "💬"; }
+        .icon-image::before { content: "🖼"; }
+        .icon-align-left::before { content: "≡"; }
+        .icon-list::before { content: "☰"; }
+
+        .demo-text {
+            font-size: 11pt;
+            line-height: 1.6;
+            color: #202124;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header with document title -->
+        <div class="header">
+            <div class="title-bar">
+                <div class="doc-icon">📄</div>
+                <div class="doc-title">Untitled document</div>
+                <div class="header-icons">
+                    <button class="icon-button">⭐</button>
+                    <button class="icon-button">📁</button>
+                    <button class="icon-button">☁</button>
+                </div>
+            </div>
+
+            <!-- Menu Bar -->
+            <div class="menu-bar">
+                <div class="dropdown">
+                    <button class="menu-item">File</button>
+                    <div class="dropdown-content">
+                        <div class="dropdown-item">
+                            <span>New</span>
+                            <span class="submenu-indicator">▶</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Open</span>
+                            <span class="shortcut">Ctrl+O</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Make a copy</span>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="dropdown-item">
+                            <span>Share</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Email</span>
+                            <span class="submenu-indicator">▶</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Download</span>
+                            <span class="submenu-indicator">▶</span>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="dropdown-item">
+                            <span>Rename</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Move</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Move to trash</span>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="dropdown-item">
+                            <span>Version history</span>
+                            <span class="shortcut">Ctrl+Alt+Shift+H</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Make available offline</span>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="dropdown-item">
+                            <span>Details</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Language</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Page setup</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Print</span>
+                            <span class="shortcut">Ctrl+P</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dropdown">
+                    <button class="menu-item">Edit</button>
+                    <div class="dropdown-content">
+                        <div class="dropdown-item">
+                            <span>Undo</span>
+                            <span class="shortcut">Ctrl+Z</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Redo</span>
+                            <span class="shortcut">Ctrl+Y</span>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="dropdown-item">
+                            <span>Cut</span>
+                            <span class="shortcut">Ctrl+X</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Copy</span>
+                            <span class="shortcut">Ctrl+C</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Paste</span>
+                            <span class="shortcut">Ctrl+V</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Paste without formatting</span>
+                            <span class="shortcut">Ctrl+Shift+V</span>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="dropdown-item">
+                            <span>Select all</span>
+                            <span class="shortcut">Ctrl+A</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Delete</span>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="dropdown-item">
+                            <span>Find and replace</span>
+                            <span class="shortcut">Ctrl+H</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dropdown">
+                    <button class="menu-item">View</button>
+                    <div class="dropdown-content">
+                        <div class="dropdown-item">
+                            <span>Print layout</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Mode</span>
+                            <span class="submenu-indicator">▶</span>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="dropdown-item">
+                            <span>Show ruler</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Show equation toolbar</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Show section breaks</span>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="dropdown-item">
+                            <span>Full screen</span>
+                            <span class="shortcut">F11</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dropdown">
+                    <button class="menu-item">Insert</button>
+                    <div class="dropdown-content">
+                        <div class="dropdown-item">
+                            <span>Image</span>
+                            <span class="submenu-indicator">▶</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Table</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Drawing</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Chart</span>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="dropdown-item">
+                            <span>Horizontal line</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Footnote</span>
+                            <span class="shortcut">Ctrl+Alt+F</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Special characters</span>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="dropdown-item">
+                            <span>Headers & footers</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Page numbers</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Page break</span>
+                            <span class="shortcut">Ctrl+Enter</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dropdown">
+                    <button class="menu-item">Format</button>
+                    <div class="dropdown-content">
+                        <div class="dropdown-item">
+                            <span>Text</span>
+                            <span class="submenu-indicator">▶</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Paragraph styles</span>
+                            <span class="submenu-indicator">▶</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Align & indent</span>
+                            <span class="submenu-indicator">▶</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Line & paragraph spacing</span>
+                            <span class="submenu-indicator">▶</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Columns</span>
+                            <span class="submenu-indicator">▶</span>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="dropdown-item">
+                            <span>Bullets & numbering</span>
+                            <span class="submenu-indicator">▶</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Borders & lines</span>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="dropdown-item">
+                            <span>Clear formatting</span>
+                            <span class="shortcut">Ctrl+\</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dropdown">
+                    <button class="menu-item">Tools</button>
+                    <div class="dropdown-content">
+                        <div class="dropdown-item">
+                            <span>Spelling and grammar</span>
+                            <span class="shortcut">Ctrl+Alt+X</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Word count</span>
+                            <span class="shortcut">Ctrl+Shift+C</span>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="dropdown-item">
+                            <span>Review suggested edits</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Compare documents</span>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="dropdown-item">
+                            <span>Citations</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Dictionary</span>
+                            <span class="shortcut">Ctrl+Shift+Y</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Explore</span>
+                            <span class="shortcut">Ctrl+Alt+Shift+I</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dropdown">
+                    <button class="menu-item">Extensions</button>
+                    <div class="dropdown-content">
+                        <div class="dropdown-item">
+                            <span>Add-ons</span>
+                            <span class="submenu-indicator">▶</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Apps Script</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dropdown">
+                    <button class="menu-item">Help</button>
+                    <div class="dropdown-content">
+                        <div class="dropdown-item">
+                            <span>Search the menus</span>
+                            <span class="shortcut">Alt+/</span>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="dropdown-item">
+                            <span>Docs Help</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Training</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Updates</span>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="dropdown-item">
+                            <span>Help Docs improve</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Report a problem</span>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="dropdown-item">
+                            <span>Privacy Policy</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Terms of Service</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <span>Keyboard shortcuts</span>
+                            <span class="shortcut">Ctrl+/</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <button class="toolbar-button icon-undo" title="Undo"></button>
+            <button class="toolbar-button icon-redo" title="Redo"></button>
+            <button class="toolbar-button icon-print" title="Print"></button>
+            <button class="toolbar-button" title="Spelling and grammar">A✓</button>
+            <button class="toolbar-button icon-paint" title="Paint format"></button>
+            
+            <div class="toolbar-divider"></div>
+            
+            <div class="toolbar-dropdown">
+                <span>Normal text</span>
+                <span class="dropdown-arrow">▼</span>
+            </div>
+            
+            <div class="toolbar-divider"></div>
+            
+            <div class="toolbar-dropdown">
+                <span>Arial</span>
+                <span class="dropdown-arrow">▼</span>
+            </div>
+            
+            <div class="toolbar-divider"></div>
+            
+            <div class="toolbar-dropdown">
+                <span>11</span>
+                <span class="dropdown-arrow">▼</span>
+            </div>
+            
+            <div class="toolbar-divider"></div>
+            
+            <button class="toolbar-button icon-bold" title="Bold (Ctrl+B)"></button>
+            <button class="toolbar-button icon-italic" title="Italic (Ctrl+I)"></button>
+            <button class="toolbar-button icon-underline" title="Underline (Ctrl+U)"></button>
+            <button class="toolbar-button" title="Text color">A</button>
+            <button class="toolbar-button" title="Highlight color">🖍</button>
+            
+            <div class="toolbar-divider"></div>
+            
+            <button class="toolbar-button icon-link" title="Insert link"></button>
+            <button class="toolbar-button icon-comment" title="Add comment"></button>
+            <button class="toolbar-button icon-image" title="Insert image"></button>
+            
+            <div class="toolbar-divider"></div>
+            
+            <button class="toolbar-button icon-align-left" title="Align"></button>
+            <button class="toolbar-button" title="Line spacing">⇅</button>
+            
+            <div class="toolbar-divider"></div>
+            
+            <button class="toolbar-button" title="Checklist">☐</button>
+            <button class="toolbar-button icon-list" title="Bulleted list"></button>
+            <button class="toolbar-button" title="Numbered list">1.</button>
+            
+            <div class="toolbar-divider"></div>
+            
+            <button class="toolbar-button" title="Decrease indent">⇤</button>
+            <button class="toolbar-button" title="Increase indent">⇥</button>
+            
+            <div class="toolbar-divider"></div>
+            
+            <button class="toolbar-button" title="Clear formatting">Tx</button>
+        </div>
+
+        <!-- Demo content area -->
+        <div class="content">
+            <div class="page">
+                <p class="demo-text">
+                    Start typing to create your document...
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
